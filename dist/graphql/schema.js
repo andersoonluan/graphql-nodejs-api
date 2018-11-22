@@ -5,12 +5,16 @@ const users = [
     {
         id: 1,
         name: 'Anderson',
-        email: 'andersoonluan@gmail.com'
+        email: 'andersoonluan@gmail.com',
+        gender: 'Male',
+        phone: '51993336963'
     },
     {
         id: 2,
         name: 'Test GraphQL',
-        email: 'test@example.com'
+        email: 'test@example.com',
+        gender: 'Female',
+        phone: null
     }
 ];
 const typeDefs = `
@@ -18,6 +22,8 @@ const typeDefs = `
         id: ID!
         name: String!
         email: String!
+        gender: String!
+        phone: String
     }
 
     type Query {
@@ -25,15 +31,10 @@ const typeDefs = `
     }
 
     type Mutation {
-        createUser(name: String!, email: String!) : User
+        createUser(name: String!, email: String!, gender: String!) : User
     }
 `;
 const resolvers = {
-    User: {
-        id: (user) => user.id,
-        name: (user) => user.name,
-        email: (user) => user.email
-    },
     Query: {
         allUsers: () => users
     },

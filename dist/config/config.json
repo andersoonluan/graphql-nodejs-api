@@ -1,0 +1,16 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "graphql_api",
+    "host": "127.0.0.1:3306",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "graphql_api",
+    "host": "127.0.0.1:3306",
+    "dialect": "mysql"
+  }
+}
