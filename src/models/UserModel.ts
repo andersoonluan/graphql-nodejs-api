@@ -56,7 +56,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) 
                     length: 'long'
                 }),
                 allowNull: false,
-                defaultValue: null
+                defaultValue: ''
             }
         },
         {

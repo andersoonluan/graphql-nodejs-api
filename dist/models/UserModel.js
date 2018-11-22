@@ -30,7 +30,7 @@ exports.default = (sequelize, DataTypes) => {
                 length: 'long'
             }),
             allowNull: false,
-            defaultValue: null
+            defaultValue: ''
         }
     }, {
         tableName: 'users',
