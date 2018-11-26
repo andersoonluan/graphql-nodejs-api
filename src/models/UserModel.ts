@@ -3,6 +3,7 @@ import { BaseModelinterface } from "../interfaces/BaseModelInterface";
 import sequelize = require("sequelize");
 import { genSaltSync, hashSync, compareSync  } from 'bcryptjs'
 import { ModelsInterface } from "../interfaces/ModelsInterface";
+import { userResolvers } from "../graphql/resources/user/user.resolvers";
 
 // Atributos iniciais do UserModel
 export interface UserAttributes {
@@ -66,6 +67,13 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) 
                 beforeCreate: (user: UserIntance, options: Sequelize.CreateOptions) : void => {
                     const salt = genSaltSync();
                     user.password = hashSync(user.password, salt);
+                },
+                // Only password changed.
+                beforeUpdate: (user: UserIntance, options: Sequelize.CreateOptions) : void => {
+                    if(user.changed('password')){
+                        const salt = genSaltSync();
+                        user.password = hashSync(user.password, salt);
+                    }
                 }
             }
         })
