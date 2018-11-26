@@ -34,3 +34,10 @@ export const onListening = (server: Server) => {
         console.log(`Listening at ${bind}...`);
     }
 }
+
+// Manipulation Error for Promisses.
+export const handleError = (error: Error) => {
+    let errorMessage: string = `${error.name}: ${error.message}`;
+    console.log(errorMessage);
+    return Promise.reject(new Error(errorMessage));
+}

@@ -2,8 +2,23 @@ import { GraphQLResolveInfo} from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnectionInterface";
 import { UserIntance } from "../../../models/UserModel";
 import { Transaction } from "sequelize";
+import {handleError} from "../../../utils/utils";
+
 
 export const userResolvers = { 
+
+    // Resolver for user posts.
+    User: {
+        posts: (user, {first = 10, offset = 0}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+            return db.Post
+                .findAll({
+                    where: {author: user.get('id')},
+                    limit: first,
+                    offset: offset
+                })
+                .catch(handleError);
+        }
+    },
 
     Query : {
 
@@ -13,17 +28,20 @@ export const userResolvers = {
                 .findAll({
                     limit: first,
                     offset: offset
-                });
+                })
+                .catch(handleError);
         },
 
         // Query user, return user by ID.
         user: (parent, {id}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+            id = parseInt(id);
             return db.User.findById(id)
             .then((user: UserIntance) => {
                 if(!user)
                     throw new Error(`User with id ${id} not found!`);
                 return user;
             })
+            .catch(handleError);
         }
 
     },
@@ -39,7 +57,8 @@ export const userResolvers = {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
                     .create(input, {transaction: t});
-            });
+            })
+            .catch(handleError);
         },
         
         // Query for update user with args inputs.
@@ -53,7 +72,8 @@ export const userResolvers = {
                             throw new Error(`User with id ${id} not found!`);
                         return user.update(input, {transaction: t});
                     })
-            }) ;         
+            })
+            .catch(handleError);
         },
 
         // Query for update user Password with args inputs.
@@ -68,7 +88,8 @@ export const userResolvers = {
                         return user.update(input, {transaction: t})
                         .then((user: UserIntance) => !! user);
                     })
-            }) ;         
+            })
+            .catch(handleError);      
         },
 
         // Query for delete user!
@@ -83,7 +104,8 @@ export const userResolvers = {
                         return user.destroy({transaction: t})
                             .then(user => !! user);
                     });
-            });
+            })
+            .catch(handleError);
         }       
 
     }

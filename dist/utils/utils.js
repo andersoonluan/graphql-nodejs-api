@@ -36,3 +36,9 @@ exports.onListening = (server) => {
         console.log(`Listening at ${bind}...`);
     };
 };
+// Manipulation Error for Promisses.
+exports.handleError = (error) => {
+    let errorMessage = `${error.name}: ${error.message}`;
+    console.log(errorMessage);
+    return Promise.reject(new Error(errorMessage));
+};

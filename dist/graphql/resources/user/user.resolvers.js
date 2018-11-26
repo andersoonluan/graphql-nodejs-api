@@ -1,6 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("../../../utils/utils");
 exports.userResolvers = {
+    // Resolver for user posts.
+    User: {
+        posts: (user, { first = 10, offset = 0 }, { db }, info) => {
+            return db.Post
+                .findAll({
+                where: { author: user.get('id') },
+                limit: first,
+                offset: offset
+            })
+                .catch(utils_1.handleError);
+        }
+    },
     Query: {
         // Query user, return list of users in DB.
         users: (parent, { first = 10, offset = 0 }, { db }, info) => {
@@ -8,7 +21,8 @@ exports.userResolvers = {
                 .findAll({
                 limit: first,
                 offset: offset
-            });
+            })
+                .catch(utils_1.handleError);
         },
         // Query user, return user by ID.
         user: (parent, { id }, { db }, info) => {
@@ -17,7 +31,8 @@ exports.userResolvers = {
                 if (!user)
                     throw new Error(`User with id ${id} not found!`);
                 return user;
-            });
+            })
+                .catch(utils_1.handleError);
         }
     },
     /**
@@ -30,7 +45,8 @@ exports.userResolvers = {
             return db.sequelize.transaction((t) => {
                 return db.User
                     .create(input, { transaction: t });
-            });
+            })
+                .catch(utils_1.handleError);
         },
         // Query for update user with args inputs.
         updateUser: (parent, { id, input }, { db }, info) => {
@@ -43,7 +59,8 @@ exports.userResolvers = {
                         throw new Error(`User with id ${id} not found!`);
                     return user.update(input, { transaction: t });
                 });
-            });
+            })
+                .catch(utils_1.handleError);
         },
         // Query for update user Password with args inputs.
         updateUserPassword: (parent, { id, input }, { db }, info) => {
@@ -57,7 +74,8 @@ exports.userResolvers = {
                     return user.update(input, { transaction: t })
                         .then((user) => !!user);
                 });
-            });
+            })
+                .catch(utils_1.handleError);
         },
         // Query for delete user!
         deleteUser: (parent, { id }, { db }, info) => {
@@ -71,7 +89,8 @@ exports.userResolvers = {
                     return user.destroy({ transaction: t })
                         .then(user => !!user);
                 });
-            });
+            })
+                .catch(utils_1.handleError);
         }
     }
 };
