@@ -2,7 +2,6 @@ import { GraphQLResolveInfo} from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnectionInterface";
 import { PostInstance } from '../../../models/PostModel';
 import { Transaction } from "sequelize";
-import { parse } from "url";
 import { handleError} from "../../../utils/utils";
 
 export const postResolvers = {
@@ -73,7 +72,7 @@ export const postResolvers = {
                     if(!post) 
                         throw new Error (`Post with id ${id} not found! `);
                     return post.update(input, {transaction: t});
-                })
+                });
             })
             .catch(handleError);
         },

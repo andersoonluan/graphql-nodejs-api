@@ -62,8 +62,9 @@ export const commentResolvers = {
             })
             .catch(handleError);
         },
+
         // Method for delete comment in page.
-        deleteComment: (parent, {id, input}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+        deleteComment: (parent, {id}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
             id = parseInt(id);
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
@@ -72,7 +73,7 @@ export const commentResolvers = {
                         if(!comment)
                             throw new Error(`Comment with id ${id} not found!`);
                             return comment.destroy({transaction: t})
-                                .then(comment => !!comment);
+                                .then(comment => !! comment);
                     });
             })
             .catch(handleError);
