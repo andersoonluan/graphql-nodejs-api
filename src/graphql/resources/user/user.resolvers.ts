@@ -102,7 +102,8 @@ export const userResolvers = {
                         if(!user)
                             throw new Error(`User with id ${id} not found!`);
                         return user.destroy({transaction: t})
-                            .then(user => !! user);
+                            .then(user => true)
+                            .catch(handleError);
                     });
             })
             .catch(handleError);

@@ -73,7 +73,8 @@ export const commentResolvers = {
                         if(!comment)
                             throw new Error(`Comment with id ${id} not found!`);
                             return comment.destroy({transaction: t})
-                                .then(comment => !! comment);
+                                .then(comment => true)
+                                .catch(handleError);
                     });
             })
             .catch(handleError);

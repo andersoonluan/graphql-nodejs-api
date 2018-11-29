@@ -86,7 +86,8 @@ export const postResolvers = {
                     if(!post) 
                         throw new Error (`Post with id ${id} not found! `);
                     return post.destroy({transaction: t})
-                        .then(post => !!post);
+                        .then(post => true)
+                        .catch(handleError);
                 })
             })
             .catch(handleError);
