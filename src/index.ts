@@ -1,6 +1,6 @@
 import * as http from 'http';
 import app from './app';
-import db from './models/Index';
+import db from './models/index';
 import { normalizePort, onError, onListening } from './utils/utils';
 
 const server = http.createServer(app);

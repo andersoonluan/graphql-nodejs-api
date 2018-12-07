@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as graphqlHTTP from 'express-graphql';
 
-import db from './models';
+import db from './models/index';
 import schema from './graphql/schema';
 
 
@@ -27,7 +27,7 @@ class App {
             // Config GraphQL Middleware
             graphqlHTTP((req) => ({
                 schema: schema,
-                graphiql: process.env.NODE_ENV.trim() === 'development',
+                graphiql: true, //process.env.NODE_ENV.trim() === 'development',
                 context: req['context']
             }))
        );
