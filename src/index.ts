@@ -4,7 +4,7 @@ import db from './models/index';
 import { normalizePort, onError, onListening } from './utils/utils';
 
 const server = http.createServer(app);
-const port = normalizePort(5000);
+const port = normalizePort(3000);
 
 // Sincronização do MYSQL
 db.sequelize.sync()

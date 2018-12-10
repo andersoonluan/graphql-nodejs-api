@@ -8,11 +8,14 @@ import { merge } from 'lodash'
 import { commentResolvers } from './resources/comment/comment.resolvers';
 import { postResolvers } from './resources/post/post.resolvers';
 import { userResolvers } from './resources/user/user.resolvers';
+import { tokenResolvers } from './resources/token/token.resolvers';
+import { tokenTypes } from './resources/token/token.schema';
 
 // Merge resolvers with Lodash
 const resolvers = merge(
     commentResolvers,
     postResolvers,
+    tokenResolvers,
     userResolvers
 )
 
@@ -30,6 +33,7 @@ export default makeExecutableSchema({
         Mutation,
         commentTypes,
         postTypes,
+        tokenTypes,
         userTypes
     ],
     resolvers

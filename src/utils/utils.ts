@@ -40,4 +40,6 @@ export const handleError = (error: Error) => {
     let errorMessage: string = `${error.name}: ${error.message}`;
     console.log(errorMessage);
     return Promise.reject(new Error(errorMessage));
-}
+};
+
+export const JWT_SECRET: string = process.env.JWT_SECRET;
