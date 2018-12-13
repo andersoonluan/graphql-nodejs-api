@@ -62,7 +62,7 @@ export const userResolvers = {
     },
 
     /**
-     * Querys Mutations for Users
+     * Queries Mutations for Users
      * @author Anderson Luan Souza Rodrigues
      */
     Mutation : {
@@ -109,7 +109,7 @@ export const userResolvers = {
 
         // Query for delete user!
         deleteUser: compose(...authResolvers) //JWT TOKEN VALIDATION
-        ((parent, {args}, {db, authUser}: {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
+        ((parent, args, {db, authUser}: {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
                     .findById(authUser.id)
