@@ -2,7 +2,10 @@ import { GraphQLResolveInfo } from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnectionInterface";
 import { Transaction } from "sequelize";
 import { CommentInstance } from "../../../models/CommentModel";
-import { handleError} from "../../../utils/utils";
+import { handleError, throwError} from "../../../utils/utils";
+import { compose } from "../../composable/composable.resolver";
+import { authResolver, authResolvers } from "../../composable/auth.resolver";
+import { AuthUser } from "../../../interfaces/AuthUserInterface";
 
 export const commentResolvers = {
 
@@ -40,45 +43,50 @@ export const commentResolvers = {
     Mutation: { 
 
         // Method for create comment in page.
-        createComment: (parent, {input}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+        createComment: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {input}, {db, authUser}: {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
+            input.user = authUser.id
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
                     .create(input, {transaction: t});
             })
             .catch(handleError);
-        },
+        }),
 
         // Method for update comment in page.
-        updateComment: (parent, {id, input}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+        updateComment: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {id, input}, {db, authUser}: {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
             id = parseInt(id);
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
                     .findById(id)
                     .then((comment: CommentInstance) =>{
-                        if(!comment)
-                            throw new Error(`Comment with id ${id} not found!`);
-                            return comment.update(input, {transaction: t});
+                        throwError(!comment, `Comment with id ${id} not found! `);
+                        throwError(comment.get('user')!= authUser.id, `Unauthorized! You can only edit comments by yourself!`);
+                         input.user = authUser.id
+                         return comment.update(input, {transaction: t});
                     });
             })
             .catch(handleError);
-        },
+        }),
 
         // Method for delete comment in page.
-        deleteComment: (parent, {id}, {db}: {db: DbConnection}, info: GraphQLResolveInfo) => {
+        deleteComment: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {id}, {db, authUser}: {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
             id = parseInt(id);
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
                     .findById(id)
                     .then((comment: CommentInstance) =>{
                         if(!comment)
-                            throw new Error(`Comment with id ${id} not found!`);
+                        throwError(!comment, `Comment with id ${id} not found! `);
+                        throwError(comment.get('user')!= authUser.id, `Unauthorized! You can only delete comment by yourself!`);
                             return comment.destroy({transaction: t})
                                 .then(comment => true)
-                                .catch(handleError);
                     });
             })
             .catch(handleError);
-        }
+        })
 
 
 

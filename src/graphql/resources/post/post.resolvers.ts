@@ -2,7 +2,10 @@ import { GraphQLResolveInfo} from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnectionInterface";
 import { PostInstance } from '../../../models/PostModel';
 import { Transaction } from "sequelize";
-import { handleError} from "../../../utils/utils";
+import { handleError, throwError} from "../../../utils/utils";
+import { compose } from "../../composable/composable.resolver";
+import { authResolvers } from "../../composable/auth.resolver";
+import { AuthUser } from "../../../interfaces/AuthUserInterface";
 
 export const postResolvers = {
 
@@ -43,8 +46,7 @@ export const postResolvers = {
             return db.Post
                 .findById(id)
                 .then((post: PostInstance) => {
-                    if(!post) 
-                        throw new Error (`Post with id ${id} not found! `);
+                    throwError(!post, `Post with id ${id} not found! `);
                     return post;
                 })
                 .catch(handleError);
@@ -55,43 +57,48 @@ export const postResolvers = {
     // Mutations for Posts
     Mutation: {
         // Method for create post.
-        createPost: (parent, {input}, {db} : {db: DbConnection}, info: GraphQLResolveInfo) => {
+        createPost: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {input}, {db, authUser} : {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
+            input.author = authUser.id
             return db.sequelize.transaction((t: Transaction) =>{
                 return db.Post
                 .create(input, {transaction: t});
             })
             .catch(handleError);
-        },
+        }),
         // Method for update post
-        updatePost: (parent, {id, input}, {db} : {db: DbConnection}, info: GraphQLResolveInfo) => {
+        updatePost: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {id, input}, {db, authUser} : {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
             id = parseInt(id);
             return db.sequelize.transaction((t: Transaction) =>{
                return db.Post
                 .findById(id)
                 .then((post: PostInstance) => {
-                    if(!post) 
-                        throw new Error (`Post with id ${id} not found! `);
+                    throwError(!post, `Post with id ${id} not found! `);
+                    throwError(post.get('author')!= authUser.id, `Unauthorized! You can only edit posts by yourself!`);
+                    input.author = authUser.id
                     return post.update(input, {transaction: t});
                 });
             })
             .catch(handleError);
-        },
+        }),
         // Method for delete post.
-        deletePost: (parent, {id}, {db} : {db: DbConnection}, info: GraphQLResolveInfo) => {
+        deletePost: compose(...authResolvers) // JWT AUTHENTICATION
+        ((parent, {id}, {db, authUser} : {db: DbConnection, authUser: AuthUser}, info: GraphQLResolveInfo) => {
             id = parseInt(id);
             return db.sequelize.transaction((t: Transaction) =>{
                return db.Post
                 .findById(id)
                 .then((post: PostInstance) => {
-                    if(!post) 
-                        throw new Error (`Post with id ${id} not found! `);
+                    throwError(!post, `Post with id ${id} not found! `);
+                    throwError(post.get('author')!= authUser.id, `Unauthorized! You can only delete posts by yourself!`);
                     return post.destroy({transaction: t})
                         .then(post => true)
                         .catch(handleError);
                 })
             })
             .catch(handleError);
-        }
+        })
     }
 
 };
