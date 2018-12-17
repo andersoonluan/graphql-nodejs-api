@@ -11,7 +11,11 @@ let db = null;
 if(!db){
     
     db = {};
-    const operatorsAliases = false;
+
+    const operatorsAliases = {
+        $in: Sequelize.Op.in // Select with list in Array ID, ex: [2,4,7,10]
+    };
+
     config = Object.assign({operatorsAliases}, config);
 
     const sequelize: Sequelize.Sequelize = new Sequelize(
