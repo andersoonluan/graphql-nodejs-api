@@ -1,9 +1,12 @@
+import * as jwt from 'jsonwebtoken';
+
 import { app, db, chai, handleError, expect } from './../../test-utils';
-import { userInfo } from 'os';
 import { UserIntance } from '../../../src/models/UserModel';
+
 
 describe('User', () => {
 
+    let token: string;
     let userId: number;
 
     beforeEach(() => {
@@ -28,9 +31,12 @@ describe('User', () => {
                 }
             ])).then((users: UserIntance[]) => {
                 userId = users[0].get('id');
+                const payload = {sub: userId};
+                token = jwt.sign(payload, "JWT_SECRET");
             });
     });
 
+    // Tests for queries
     describe('Queries', () => {
 
         describe('application/json', () => {
@@ -208,5 +214,90 @@ describe('User', () => {
             })
 
         });
+    });
+
+    // Tests for Mutations
+    describe('Mutations', () => {
+
+        describe('application/json', () => {
+
+            describe('createUser', () => {
+                it('Mutation 1: should create new User', () => {
+
+                    let body = {
+                        query: `
+                             mutation createNewUser($input: UserCreateInput!){
+                                 createUser(input: $input){
+                                     id
+                                     name
+                                     email
+                                 }
+                             }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Maria Vitorino',
+                                email: 'maria@test.com',
+                                password: '1234'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const createdUser = res.body.data.createUser;
+                            expect(createdUser).to.be.an('object');
+                            expect(createdUser.name).to.equal('Maria Vitorino');
+                            expect(createdUser.email).to.equals('maria@test.com');
+                            expect(parseInt(createdUser.id)).to.be.a('number');
+                        }).catch(handleError);
+                })
+            });
+        });
+
+        describe('application/json', () => {
+
+            describe('updateUser', () => {
+                it('Mutation 2: should update an existing User', () => {
+
+                    let body = {
+                        query: `
+                             mutation updateExistingUser($input: UserUpdateInput!){
+                                 updateUser(input: $input){
+                                     name
+                                     email
+                                     photo
+                                 }
+                             }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Jorge Vitorino',
+                                email: 'jorge@test.com',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const updatedUser = res.body.data.updateUser;
+                            expect(updatedUser).to.be.an('object');
+                            expect(updatedUser.name).to.equals('Jorge Vitorino');
+                            expect(updatedUser.email).to.equals('jorge@test.com');
+                            expect(updatedUser.photo).to.be.not.null;
+                            expect(updatedUser.id).to.be.undefined;
+                        }).catch(handleError);
+                })
+            });
+        });
+
     });
 });
