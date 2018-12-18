@@ -38,7 +38,7 @@ export const onListening = (server: Server) => {
 // Manipulation Error for Promisses.
 export const handleError = (error: Error) => {
     let errorMessage: string = `${error.name}: ${error.message}`;
-    console.log(errorMessage);
+    if(process.env.NODE_ENV.trim() !== 'test') {console.log(errorMessage); }
     return Promise.reject(new Error(errorMessage));
 };
 
