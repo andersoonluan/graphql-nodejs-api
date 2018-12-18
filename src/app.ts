@@ -42,7 +42,7 @@ class App {
             // Config GraphQL Middleware
             graphqlHTTP((req) => ({
                 schema: schema,
-                graphiql: true, //process.env.NODE_ENV.trim() === 'development',
+                graphiql: process.env.NODE_ENV.trim() === 'development' ? true : false,
                 context: req['context']
             }))
        );
