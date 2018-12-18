@@ -163,8 +163,134 @@ describe('Post', () => {
                         .catch(handleError);
                 });
 
+                it('sould paginate a list of Posts using application/graphql', () => {
+                    let query = `
+                            query getPostsList($first: Int, $offset: Int){
+                                posts(first: $first, offset: $offset) {
+                                    title
+                                    content
+                                    photo
+                                }
+                            }
+                        `;
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/graphql')
+                        .send(query)
+                        .query({
+                            variables: JSON.stringify({
+                                first: 2,
+                                offset: 1
+                            })
+                        })
+                        .then(res => {
+                            const postsList = res.body.data.posts;
+                            //test validation 1
+                            expect(res.body.data).to.be.an('object'); 
+                            //test validation 2
+                            expect(postsList).to.be.an('array').with.length(2); 
+                            // test validation 3
+                            expect(postsList[0]).to.not.have.keys(['id', 'createdAt', 'updatedAt', 'author', 'comments']); 
+                            expect(postsList[0]).to.have.keys(['title', 'content', 'photo']);
+                            expect(postsList[0].title).to.equals('Second Post');
+                        })
+                        .catch(handleError);
+                });
+
             });
         });
 
     });
+
+    describe('Mutations', () => {
+
+        describe('application/json', () => {
+
+            describe('createPost', () => {
+
+                it('should create a new Post', () => {
+                    let body = {
+                        query: `
+                            mutation createNewPost($input: PostInput!) {
+                                createPost(input: $input) {
+                                    id
+                                    title
+                                    content
+                                    author {
+                                        id
+                                        name
+                                        email
+                                    }
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                title: 'Fourth Post',
+                                content: 'Create Fourth Post with Mocha',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const createdPost = res.body.data.createPost;
+                            expect(createdPost).to.be.an('object');
+                            expect(createdPost).to.have.keys(['id', 'title','content', 'author'])
+                            expect(createdPost.title).to.equals('Fourth Post');
+                            expect(createdPost.content).to.equals('Create Fourth Post with Mocha');
+                            expect(parseInt(createdPost.author.id)).to.equals(userId);
+                        })
+                        .catch(handleError);
+                });
+            });
+
+            describe('updatePost', () => {
+
+                it('should update a existing Post', () => {
+                    let body = {
+                        query: `
+                            mutation updateExistingPost($id: ID!, $input: PostInput!) {
+                                updatePost(id: $id, input: $input) {
+                                   title
+                                   content
+                                   photo
+                                }
+                            }
+                        `,
+                        variables: {
+                            id: postId,
+                            input: {
+                                title: 'Post Changed Fourth Post',
+                                content: 'Content Changed Create Fourth Post with Mocha',
+                                photo: 'some_photo_2'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const updatedPost = res.body.data.updatePost;
+                            expect(updatedPost).to.be.an('object');
+                            expect(updatedPost).to.have.keys(['title','content', 'photo'])
+                            expect(updatedPost.title).to.equals('Post Changed Fourth Post');
+                            expect(updatedPost.content).to.equals('Content Changed Create Fourth Post with Mocha');
+                            expect(updatedPost.photo).to.equals('some_photo_2');
+                        })
+                        .catch(handleError);
+                });
+            });
+
+        });
+    });
+
 });
