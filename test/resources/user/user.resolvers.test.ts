@@ -109,7 +109,7 @@ describe('User', () => {
 
             });
 
-            // endoint user
+            // endpoint user
             describe('user', () => {
                 
                 it('Query 3: should return a single User', () => {
@@ -152,7 +152,7 @@ describe('User', () => {
 
                     let body = {
                         query: `
-                            query getSingleUser($id: ID!){
+                            query getOnlyName($id: ID!){
                                 user(id: $id) {
                                    name
                                 }
@@ -185,7 +185,7 @@ describe('User', () => {
 
                     let body = {
                         query: `
-                            query getSingleUser($id: ID!){
+                            query getReturnError($id: ID!){
                                 user(id: $id) {
                                    name
                                    email
@@ -261,6 +261,7 @@ describe('User', () => {
         describe('application/json', () => {
 
             describe('updateUser', () => {
+
                 it('Mutation 2: should update an existing User', () => {
 
                     let body = {
@@ -296,6 +297,41 @@ describe('User', () => {
                             expect(updatedUser.id).to.be.undefined;
                         }).catch(handleError);
                 })
+
+                it('Mutation 3: should block operation if token is invalid', () => {
+
+                    let body = {
+                        query: `
+                             mutation updateExistingUser($input: UserUpdateInput!){
+                                 updateUser(input: $input){
+                                     name
+                                     email
+                                     photo
+                                 }
+                             }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Jorge Vitorino',
+                                email: 'jorge@test.com',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', 'Bearer INVALID_TOKEN')
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.data.updateUser).to.be.null;
+                            expect(res.body).to.have.keys(['data', 'errors']);
+                            expect(res.body.errors).to.be.an('array');
+                            expect(res.body.errors[0].message).to.equal('JsonWebTokenError: jwt malformed');
+                        }).catch(handleError);
+                });
+
             });
         });
 
