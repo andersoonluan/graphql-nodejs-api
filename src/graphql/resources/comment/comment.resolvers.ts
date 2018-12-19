@@ -37,7 +37,7 @@ export const commentResolvers = {
                     where: {post: postId},
                     limit: first,
                     offset: offset,
-                    attributes: context.requestedFields.getFields(info)
+                    attributes: context.requestedFields.getFields(info, {keep: undefined})
                 })
                 .catch(handleError);
         }
