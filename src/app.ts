@@ -46,6 +46,12 @@ class App {
         // Set Helmet for security
         this.express.use(helmet());
 
+        this.express.use('/healthcheck', require('express-healthcheck')({
+            healthy: function () {
+                return { everything: 'is ok' };
+            }
+        }));
+
        this.express.use('/graphql', 
        
         extractJwtMiddleware(),
