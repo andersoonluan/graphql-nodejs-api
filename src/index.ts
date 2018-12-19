@@ -2,6 +2,7 @@ import * as http from 'http';
 import app from './app';
 import db from './models/index';
 import { normalizePort, onError, onListening } from './utils/utils';
+require('dotenv').load();
 
 const server = http.createServer(app);
 const port = normalizePort(3000);

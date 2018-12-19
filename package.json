@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node_modules/.bin/nodemon --delay 5 dist/index",
     "gulp": "node_modules/.bin/gulp",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc --extension .ts --include src/**/*.ts --reporter html npm test"
   },
   "repository": {
     "type": "git",
@@ -34,12 +35,14 @@
     "gulp-typescript": "3.2.2",
     "mocha": "4.0.1",
     "nodemon": "1.12.0",
+    "nyc": "11.3.0",
     "ts-node": "3.3.0",
     "typescript": "2.8"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
     "dataloader": "1.3.0",
+    "dotenv": "^6.2.0",
     "express": "4.16.2",
     "express-graphql": "0.6.11",
     "graphql": "0.11.7",
