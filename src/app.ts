@@ -48,7 +48,16 @@ class App {
 
         this.express.use('/healthcheck', require('express-healthcheck')({
             healthy: function () {
-                return { everything: 'is ok' };
+                var os = require('os');
+                return { 
+                    everything: 'running',
+                    serverName:  os.hostname() ,
+                    clusters: os.cpus(),
+                    up: os.uptime(),
+                    release: os.release(),
+                    freemem: os.freemem(),
+                    type: os.type()
+                };
             }
         }));
 
