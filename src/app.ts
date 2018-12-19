@@ -1,6 +1,8 @@
 import * as express from 'express';
 import * as graphqlHTTP from 'express-graphql';
 import * as cors from 'cors';
+import * as compression from 'compression';
+import * as helmet from 'helmet';
 
 import db from './models/index';
 import schema from './graphql/schema';
@@ -29,6 +31,7 @@ class App {
     // Middleware to sincronization GraphQL
     private middleware() : void {
 
+        
         // Config CORS
         this.express.use(cors({
             origin: '*',
@@ -37,6 +40,11 @@ class App {
             preflightContinue: false,
             optionsSuccessStatus: 204
         }));
+        
+        // Set compression 
+        this.express.use(compression());
+        // Set Helmet for security
+        this.express.use(helmet());
 
        this.express.use('/graphql', 
        
