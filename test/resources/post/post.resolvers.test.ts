@@ -290,6 +290,33 @@ describe('Post', () => {
                 });
             });
 
+            describe('deletePost', () => {
+
+                it('should delete a existing Post', () => {
+                    let body = {
+                        query: `
+                            mutation deleteExistingPost($id: ID!) {
+                                deletePost(id: $id)
+                            }
+                        `,
+                        variables: {
+                            id: postId
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.data).to.have.key('deletePost');
+                            expect(res.body.data.deletePost).to.be.true;
+                        })
+                        .catch(handleError);
+                });
+            });
+
         });
     });
 
