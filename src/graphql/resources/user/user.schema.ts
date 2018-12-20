@@ -3,24 +3,31 @@ const userTypes = `
     # User definition type
     type User {
         id: ID!
+        cpf: String!
         name: String!
         email: String!
         photo: String
+        phone: String
+        gender: String
         createdAt: String!
         updatedAt: String!
         posts(first: Int, offset:Int): [ Post! ]!
     }
 
     input UserCreateInput {
+        cpf: String!
         name: String!
         email: String!
         password: String!
     }
 
     input UserUpdateInput {
+        cpf: String
         name: String!
         email: String!
         photo: String!
+        gender: String!
+        phone: String!
     }
 
     input UserUpdatePasswordInput {

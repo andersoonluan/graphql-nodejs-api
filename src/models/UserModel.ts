@@ -9,10 +9,13 @@ import { userResolvers } from "../graphql/resources/user/user.resolvers";
 export interface UserAttributes {
     
     id?: number;
+    cpf?: string;
     name?: string;
     email?: string;
     password?: string;
     photo?: string;
+    phone?: string;
+    gender?: string;
     createdAt?: string,
     updatedAt?: string
 }
@@ -36,6 +39,10 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) 
                 primaryKey: true,
                 autoIncrement: true
             },
+            cpf: {
+                type: DataTypes.STRING(30),
+                allowNull: false
+            },
             name: {
                 type: DataTypes.STRING(128),
                 allowNull: false
@@ -58,6 +65,16 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) 
                 }),
                 allowNull: false,
                 defaultValue: ''
+            },
+            phone: {
+                type: DataTypes.STRING(20),
+                allowNull: null,
+                defaultValue: null
+            },
+            gender: {
+                type: DataTypes.CHAR(1),
+                allowNull: true,
+                defaultValue: null
             }
         },
         {

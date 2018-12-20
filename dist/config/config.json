@@ -16,10 +16,10 @@
     "logging" : false
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "graphql_api",
-    "host": "127.0.0.1",
+    "username": "u978583269_drcha",
+    "password": "senhamsn123",
+    "database": "u978583269_drcha",
+    "host": "sql50.main-hosting.eu",
     "dialect": "mysql",
     "logging" : false
   }
